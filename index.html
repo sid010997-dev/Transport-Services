@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Services - Heavy Vehicle Transportation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <i class="fas fa-truck"></i> Transport Services
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#booking" class="nav-link">Booking</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="#" class="nav-link" id="accountBtn">Account</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Professional Heavy Vehicle Transportation</h1>
+            <p>Reliable, Safe, and Affordable Transport Solutions for Your Business</p>
+            <button class="btn btn-primary" onclick="document.getElementById('booking').scrollIntoView({behavior: 'smooth'})">Book Now</button>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Introduction Section -->
+    <section id="introduction" class="introduction">
+        <div class="container">
+            <h2>About Our Service</h2>
+            <div class="intro-content">
+                <div class="intro-text">
+                    <p>Welcome to Transport Services, your trusted partner for heavy vehicle transportation. With over a decade of experience, we provide reliable and professional transportation solutions using modern tempos, trucks, and heavy-duty vehicles.</p>
+                    <p>Our fleet is well-maintained, insured, and operated by trained professionals. We specialize in transporting goods safely and on time, whether it's local or long-distance deliveries.</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Modern Fleet of Vehicles</li>
+                        <li><i class="fas fa-check"></i> Professional & Trained Drivers</li>
+                        <li><i class="fas fa-check"></i> Full Insurance Coverage</li>
+                        <li><i class="fas fa-check"></i> 24/7 Customer Support</li>
+                        <li><i class="fas fa-check"></i> Real-time Tracking</li>
+                        <li><i class="fas fa-check"></i> Competitive Pricing</li>
+                    </ul>
+                </div>
+                <div class="intro-image">
+                    <img src="https://via.placeholder.com/400x300?text=Heavy+Vehicles" alt="Transport Vehicles">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h3>General Cargo Transport</h3>
+                    <p>Transport of general goods and cargo using our fleet of trucks and tempos. Suitable for various types of merchandise.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>Construction Material Transport</h3>
+                    <p>Specialized transportation for construction materials, sand, gravel, steel, and other heavy materials.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-dolly"></i>
+                    </div>
+                    <h3>Household Shifting</h3>
+                    <p>Professional household and office relocation services with careful handling of your belongings.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3>Industrial Equipment Transport</h3>
+                    <p>Safe transportation of heavy industrial machinery and equipment with proper handling and safety measures.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <h3>Long Distance Delivery</h3>
+                    <p>Interstate and inter-state transportation services with GPS tracking and regular updates.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <h3>Same Day Delivery</h3>
+                    <p>Quick and efficient same-day delivery services for urgent shipments within city limits.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking/Reservation Section -->
+    <section id="booking" class="booking">
+        <div class="container">
+            <h2>Book Your Transport</h2>
+            <div class="booking-form-container">
+                <form id="bookingForm" class="booking-form">
+                    <div class="form-group">
+                        <label for="pickupLocation">Pickup Location *</label>
+                        <input type="text" id="pickupLocation" name="pickupLocation" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dropoffLocation">Dropoff Location *</label>
+                        <input type="text" id="dropoffLocation" name="dropoffLocation" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pickupDate">Pickup Date *</label>
+                            <input type="date" id="pickupDate" name="pickupDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pickupTime">Pickup Time *</label>
+                            <input type="time" id="pickupTime" name="pickupTime" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type *</label>
+                        <select id="vehicleType" name="vehicleType" required>
+                            <option value="">Select Vehicle Type</option>
+                            <option value="tempo">Tempo (3-5 Ton)</option>
+                            <option value="truck-6ton">Small Truck (6-8 Ton)</option>
+                            <option value="truck-10ton">Medium Truck (10-12 Ton)</option>
+                            <option value="truck-20ton">Large Truck (18-20 Ton)</option>
+                            <option value="container">Container Truck</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cargoWeight">Approximate Cargo Weight (Kg) *</label>
+                        <input type="number" id="cargoWeight" name="cargoWeight" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cargoType">Type of Cargo *</label>
+                        <select id="cargoType" name="cargoType" required>
+                            <option value="">Select Cargo Type</option>
+                            <option value="general">General Goods</option>
+                            <option value="construction">Construction Materials</option>
+                            <option value="fragile">Fragile Items</option>
+                            <option value="household">Household Items</option>
+                            <option value="industrial">Industrial Equipment</option>
+                            <option value="perishable">Perishable Goods</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Additional Details</label>
+                        <textarea id="description" name="description" rows="4" placeholder="Any special instructions or details about the cargo"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactPerson">Contact Person Name *</label>
+                        <input type="text" id="contactPerson" name="contactPerson" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number *</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="price-estimate">
+                        <p>Estimated Price: <span id="estimatedPrice">$0.00</span></p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Proceed to Payment</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Section -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Payment Details</h2>
+            <form id="paymentForm" class="payment-form">
+                <div class="form-group">
+                    <label for="cardName">Cardholder Name *</label>
+                    <input type="text" id="cardName" name="cardName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardNumber">Card Number *</label>
+                    <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date *</label>
+                        <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV *</label>
+                        <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <h4>Or Choose Payment Method:</h4>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="upi" checked> UPI
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="netbanking"> Net Banking
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="wallet"> Digital Wallet
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Complete Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Address</h4>
+                            <p>123 Transport Hub, City Center<br>Your City, State 12345</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Phone</h4>
+                            <p>+1 (800) 123-4567<br>+1 (800) 123-4568</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p>info@transportservices.com<br>support@transportservices.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h4>Hours</h4>
+                            <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM<br>Sunday: Closed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label for="contactName">Name *</label>
+                        <input type="text" id="contactName" name="contactName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactEmail">Email *</label>
+                        <input type="email" id="contactEmail" name="contactEmail" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactPhone">Phone *</label>
+                        <input type="tel" id="contactPhone" name="contactPhone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+
+            <!-- Map Integration -->
+            <div class="map-container">
+                <h3>Find Us On Map</h3>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.2219901290355!2d-74.00601!3d40.71282!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQyJzU0LjIiTiA3NMKwMDAnMjEuNiJX!5e0!3m2!1sen!2sus!4v1234567890" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Transport Services. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Account Modal -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>User Account</h2>
+            <div class="account-tabs">
+                <button class="tab-button active" data-tab="login">Login</button>
+                <button class="tab-button" data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Tab -->
+            <div id="login" class="tab-content active">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email *</label>
+                        <input type="email" id="loginEmail" name="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password *</label>
+                        <input type="password" id="loginPassword" name="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+            </div>
+
+            <!-- Register Tab -->
+            <div id="register" class="tab-content">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName">Full Name *</label>
+                        <input type="text" id="registerName" name="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email *</label>
+                        <input type="email" id="registerEmail" name="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">Phone *</label>
+                        <input type="tel" id="registerPhone" name="registerPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password *</label>
+                        <input type="password" id="registerPassword" name="registerPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Confirm Password *</label>
+                        <input type="password" id="registerConfirmPassword" name="registerConfirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
