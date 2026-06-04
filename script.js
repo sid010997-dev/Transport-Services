@@ -1,4 +1,51 @@
-// Pricing calculation
+// API Configuration
+const API_BASE_URL = 'http://localhost:5000/api';
+
+// Token Management
+function setToken(token) {
+    localStorage.setItem('authToken', token);
+}
+
+function getToken() {
+    return localStorage.getItem('authToken');
+}
+
+function removeToken() {
+    localStorage.removeItem('authToken');
+}
+
+// API Helper Function
+async function apiCall(endpoint, method = 'GET', data = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    const token = getToken();
+    if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (data && (method === 'POST' || method === 'PUT')) {
+        options.body = JSON.stringify(data);
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'API Error');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
+}
+
+// ==================== Pricing calculation ====================
 const vehiclePrices = {
     'tempo': 50,
     'truck-6ton': 75,
@@ -15,10 +62,16 @@ const paymentModal = document.getElementById('paymentModal');
 const accountBtn = document.getElementById('accountBtn');
 const closeButtons = document.querySelectorAll('.close');
 
-// Account Modal Functions
+// ==================== Modal Management ====================
+
 accountBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    accountModal.style.display = 'block';
+    const token = getToken();
+    if (token) {
+        alert('You are already logged in!');
+    } else {
+        accountModal.style.display = 'block';
+    }
 });
 
 closeButtons.forEach(btn => {
@@ -37,7 +90,8 @@ window.addEventListener('click', (event) => {
     }
 });
 
-// Account Tabs
+// ==================== Account Tabs ====================
+
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
 
@@ -45,32 +99,37 @@ tabButtons.forEach(button => {
     button.addEventListener('click', () => {
         const tabName = button.getAttribute('data-tab');
         
-        // Remove active class from all buttons and contents
         tabButtons.forEach(btn => btn.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
         
-        // Add active class to clicked button and corresponding content
         button.classList.add('active');
         document.getElementById(tabName).classList.add('active');
     });
 });
 
-// Login Form
-document.getElementById('loginForm').addEventListener('submit', (e) => {
+// ==================== Login Form ====================
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    // Basic validation
-    if (email && password) {
-        alert(`Welcome back! You have logged in successfully.\nEmail: ${email}`);
+    try {
+        const response = await apiCall('/auth/login', 'POST', { email, password });
+        
+        setToken(response.token);
+        alert(`Welcome back, ${response.user.name}!`);
         accountModal.style.display = 'none';
         document.getElementById('loginForm').reset();
+        updateUIAfterLogin();
+    } catch (error) {
+        alert('Login failed: ' + error.message);
     }
 });
 
-// Register Form
-document.getElementById('registerForm').addEventListener('submit', (e) => {
+// ==================== Register Form ====================
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('registerName').value;
     const email = document.getElementById('registerEmail').value;
@@ -83,15 +142,43 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
         return;
     }
     
-    if (name && email && phone && password) {
-        alert(`Account created successfully!\nWelcome, ${name}!\nEmail: ${email}`);
+    try {
+        const response = await apiCall('/auth/register', 'POST', {
+            name, email, phone, password, confirmPassword
+        });
+        
+        setToken(response.token);
+        alert(`Account created successfully! Welcome, ${response.user.name}!`);
         accountModal.style.display = 'none';
         document.getElementById('registerForm').reset();
+        updateUIAfterLogin();
+    } catch (error) {
+        alert('Registration failed: ' + error.message);
     }
 });
 
-// Booking Form
-document.getElementById('bookingForm').addEventListener('submit', (e) => {
+// ==================== Update UI After Login ====================
+
+function updateUIAfterLogin() {
+    const token = getToken();
+    if (token) {
+        accountBtn.textContent = 'Logout';
+        accountBtn.onclick = (e) => {
+            e.preventDefault();
+            removeToken();
+            alert('You have been logged out!');
+            accountBtn.textContent = 'Account';
+            updateUIAfterLogin();
+        };
+    }
+}
+
+// Call on page load
+window.addEventListener('load', updateUIAfterLogin);
+
+// ==================== Booking Form ====================
+
+document.getElementById('bookingForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const pickupLocation = document.getElementById('pickupLocation').value;
@@ -101,11 +188,11 @@ document.getElementById('bookingForm').addEventListener('submit', (e) => {
     const vehicleType = document.getElementById('vehicleType').value;
     const cargoWeight = parseFloat(document.getElementById('cargoWeight').value);
     const cargoType = document.getElementById('cargoType').value;
+    const description = document.getElementById('description').value;
     const contactPerson = document.getElementById('contactPerson').value;
     const phoneNumber = document.getElementById('phoneNumber').value;
     const email = document.getElementById('email').value;
     
-    // Validate all fields
     if (!pickupLocation || !dropoffLocation || !pickupDate || !pickupTime || 
         !vehicleType || !cargoWeight || !cargoType || !contactPerson || 
         !phoneNumber || !email) {
@@ -113,30 +200,35 @@ document.getElementById('bookingForm').addEventListener('submit', (e) => {
         return;
     }
     
-    // Store booking details
-    const bookingDetails = {
-        pickupLocation,
-        dropoffLocation,
-        pickupDate,
-        pickupTime,
-        vehicleType,
-        cargoWeight,
-        cargoType,
-        contactPerson,
-        phoneNumber,
-        email,
-        estimatedPrice: document.getElementById('estimatedPrice').textContent
+    const estimatedPrice = document.getElementById('estimatedPrice').textContent.replace('$', '');
+    
+    const bookingData = {
+        pickupLocation, dropoffLocation, pickupDate, pickupTime,
+        vehicleType, cargoWeight, cargoType, description,
+        contactPerson, phoneNumber, email,
+        estimatedPrice: parseFloat(estimatedPrice)
     };
     
-    // Save to localStorage
-    localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
-    
-    // Show payment modal
-    paymentModal.style.display = 'block';
+    try {
+        const response = await apiCall('/bookings', 'POST', bookingData);
+        
+        // Store booking details in localStorage
+        localStorage.setItem('bookingDetails', JSON.stringify({
+            ...bookingData,
+            bookingId: response.booking._id,
+            trackingNumber: response.booking.trackingNumber
+        }));
+        
+        alert(`Booking created! Tracking Number: ${response.booking.trackingNumber}`);
+        paymentModal.style.display = 'block';
+    } catch (error) {
+        alert('Booking failed: ' + error.message);
+    }
 });
 
-// Payment Form
-document.getElementById('paymentForm').addEventListener('submit', (e) => {
+// ==================== Payment Form ====================
+
+document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const cardName = document.getElementById('cardName').value;
@@ -145,46 +237,60 @@ document.getElementById('paymentForm').addEventListener('submit', (e) => {
     const cvv = document.getElementById('cvv').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
     
-    // Basic card validation
     if (!cardName || !cardNumber || !expiryDate || !cvv) {
         alert('Please fill in all payment details!');
         return;
     }
     
-    // Simple card number validation (basic check)
     if (cardNumber.replace(/\s/g, '').length !== 16) {
         alert('Card number must be 16 digits!');
         return;
     }
     
-    // Validate expiry date format
     if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
         alert('Please enter expiry date in MM/YY format!');
         return;
     }
     
-    // Validate CVV
     if (!/^\d{3}$/.test(cvv)) {
         alert('CVV must be 3 digits!');
         return;
     }
     
-    // Get booking details
-    const bookingDetails = JSON.parse(localStorage.getItem('bookingDetails'));
-    
-    alert(`Payment Successful!\n\nBooking Confirmation:\nVehicle: ${bookingDetails.vehicleType}\nPickup: ${bookingDetails.pickupLocation}\nDropoff: ${bookingDetails.dropoffLocation}\nDate: ${bookingDetails.pickupDate}\nAmount Paid: ${bookingDetails.estimatedPrice}\n\nThank you for using our service!`);
-    
-    // Reset forms
-    document.getElementById('bookingForm').reset();
-    document.getElementById('paymentForm').reset();
-    paymentModal.style.display = 'none';
-    
-    // Clear localStorage
-    localStorage.removeItem('bookingDetails');
+    try {
+        const bookingDetails = JSON.parse(localStorage.getItem('bookingDetails'));
+        const amount = bookingDetails.estimatedPrice;
+        
+        // Create payment intent on backend
+        const paymentIntentResponse = await apiCall('/payments/create-intent', 'POST', {
+            bookingId: bookingDetails.bookingId,
+            amount
+        });
+        
+        // In production, use Stripe to process the actual payment
+        // For now, we'll simulate the payment
+        const paymentResponse = await apiCall('/payments/confirm', 'POST', {
+            bookingId: bookingDetails.bookingId,
+            paymentMethod,
+            stripePaymentId: paymentIntentResponse.clientSecret,
+            amount
+        });
+        
+        alert(`Payment Successful!\n\nBooking Confirmation:\nTracking: ${bookingDetails.trackingNumber}\nVehicle: ${bookingDetails.vehicleType}\nAmount Paid: $${amount}\n\nThank you for using our service!`);
+        
+        document.getElementById('bookingForm').reset();
+        document.getElementById('paymentForm').reset();
+        paymentModal.style.display = 'none';
+        localStorage.removeItem('bookingDetails');
+        calculatePrice();
+    } catch (error) {
+        alert('Payment failed: ' + error.message);
+    }
 });
 
-// Contact Form
-document.getElementById('contactForm').addEventListener('submit', (e) => {
+// ==================== Contact Form ====================
+
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const name = document.getElementById('contactName').value;
@@ -193,16 +299,28 @@ document.getElementById('contactForm').addEventListener('submit', (e) => {
     const subject = document.getElementById('subject').value;
     const message = document.getElementById('message').value;
     
-    if (name && email && phone && subject && message) {
-        alert(`Thank you for contacting us, ${name}!\n\nWe have received your message and will get back to you soon.\n\nYour Details:\nEmail: ${email}\nPhone: ${phone}\nSubject: ${subject}`);
+    if (!name || !email || !phone || !subject || !message) {
+        alert('Please fill in all fields!');
+        return;
+    }
+    
+    try {
+        const response = await apiCall('/contact', 'POST', {
+            name, email, phone, subject, message
+        });
+        
+        alert(`Thank you for contacting us, ${name}!\n\nWe have received your message and will get back to you soon.`);
         document.getElementById('contactForm').reset();
+    } catch (error) {
+        alert('Failed to send message: ' + error.message);
     }
 });
 
-// Calculate Estimated Price
+// ==================== Price Calculation ====================
+
 function calculatePrice() {
     const vehicleType = document.getElementById('vehicleType').value;
-    const distance = 10; // Default distance assumption in km
+    const distance = 10; // Default distance in km
     
     if (vehicleType) {
         const basePrice = vehiclePrices[vehicleType];
@@ -213,19 +331,18 @@ function calculatePrice() {
     }
 }
 
-// Event listeners for price calculation
 document.getElementById('vehicleType').addEventListener('change', calculatePrice);
 document.getElementById('pickupLocation').addEventListener('change', calculatePrice);
 document.getElementById('dropoffLocation').addEventListener('change', calculatePrice);
 
-// Card number formatting
+// ==================== Card Formatting ====================
+
 document.getElementById('cardNumber').addEventListener('input', (e) => {
     let value = e.target.value.replace(/\s/g, '');
     let formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
     e.target.value = formattedValue;
 });
 
-// Expiry date formatting
 document.getElementById('expiryDate').addEventListener('input', (e) => {
     let value = e.target.value.replace(/\D/g, '');
     if (value.length >= 2) {
@@ -234,12 +351,12 @@ document.getElementById('expiryDate').addEventListener('input', (e) => {
     e.target.value = value;
 });
 
-// CVV number only
 document.getElementById('cvv').addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/\D/g, '');
 });
 
-// Smooth scrolling for navigation links
+// ==================== Smooth Scrolling ====================
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
@@ -252,60 +369,69 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Mobile hamburger menu toggle
+// ==================== Mobile Menu ====================
+
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
 
-hamburger.addEventListener('click', () => {
-    navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
-});
+if (hamburger) {
+    hamburger.addEventListener('click', () => {
+        navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+    });
+}
 
-// Close menu when a link is clicked
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
-        navMenu.style.display = 'none';
+        if (navMenu) navMenu.style.display = 'none';
     });
 });
 
-// Date validation - prevent past dates
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('pickupDate').setAttribute('min', today);
+// ==================== Date Validation ====================
 
-// Validate phone numbers
+const today = new Date().toISOString().split('T')[0];
+if (document.getElementById('pickupDate')) {
+    document.getElementById('pickupDate').setAttribute('min', today);
+}
+
+// ==================== Phone Validation ====================
+
 function validatePhoneNumber(phone) {
     return /^[\d\s\-\+\(\)]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10;
 }
 
-document.getElementById('phoneNumber').addEventListener('blur', function() {
+document.getElementById('phoneNumber')?.addEventListener('blur', function() {
     if (this.value && !validatePhoneNumber(this.value)) {
         alert('Please enter a valid phone number!');
     }
 });
 
-document.getElementById('contactPhone').addEventListener('blur', function() {
+document.getElementById('contactPhone')?.addEventListener('blur', function() {
     if (this.value && !validatePhoneNumber(this.value)) {
         alert('Please enter a valid phone number!');
     }
 });
 
-// Validate email
+// ==================== Email Validation ====================
+
 function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-document.getElementById('email').addEventListener('blur', function() {
+document.getElementById('email')?.addEventListener('blur', function() {
     if (this.value && !validateEmail(this.value)) {
         alert('Please enter a valid email address!');
     }
 });
 
-document.getElementById('contactEmail').addEventListener('blur', function() {
+document.getElementById('contactEmail')?.addEventListener('blur', function() {
     if (this.value && !validateEmail(this.value)) {
         alert('Please enter a valid email address!');
     }
 });
 
-// Initialize price on page load
+// ==================== Initialize ====================
+
 window.addEventListener('load', () => {
     calculatePrice();
+    updateUIAfterLogin();
 });
