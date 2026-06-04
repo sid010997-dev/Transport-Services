@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const stripe = require('stripe');
+const path = require('path');
 
 dotenv.config();
 
@@ -15,6 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, '.')));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/transport-services')
@@ -423,6 +427,20 @@ app.get('/api/admin/stats', async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== Frontend Routes ====================
+
+// Serve index.html for root path
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve index.html for any other non-API routes (SPA support)
+app.get('/*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, 'index.html'));
     }
 });
 
